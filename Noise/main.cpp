@@ -1,12 +1,13 @@
+#include <thread>
 #include <iostream>
 #include <fstream>
 #include <ctime>
 
-const int HEIGHT = 256, WIDTH = 256;
+const int HEIGHT = 2048, WIDTH = 2048;
 int map[HEIGHT][WIDTH];
 
 
-void genMap() {
+void genMapBase() {
 	srand(time(0));
 	int randInt = 0;
 	for (int i = 0; i < HEIGHT; ++i) {
@@ -15,22 +16,23 @@ void genMap() {
 			map[i][j] = randInt;
 		}
 	}
-	
-	int AMH = 0;
-	int passage = 6;
-	for (int j = 0; j < passage; ++j) {
-			for (int i = 0; i < HEIGHT; ++i) {
-			for (int j = 0; j < WIDTH; ++j) {
-				AMH = ((map[i][j] * 2) + map[i-1][j] + map[i+1][j] + map[i][j-1] + map[i][j+1] + map[i-1][j-1] + map[i+1][j+1] + map[i-1][j+1] + map[i+1][j-1]) / 9;
-				while (AMH > 9) {
-					--AMH;
-				}
-					map[i][j] = AMH;
-			}
-		}
-	}
 }
 
+void genMapTerrain(int passage) {
+	int AMH = 0;
+	for (int passageMade = 0; passageMade < passage; ++passageMade) {
+			for (int i = 0; i < HEIGHT; ++i) {
+				for (int j = 0; j < WIDTH; ++j) {
+					AMH = ((map[i][j] * 2) + map[i-1][j] + map[i+1][j] + map[i][j-1] + map[i][j+1] + map[i-1][j-1] + map[i+1][j+1] + map[i-1][j+1] + map[i+1][j-1]) / 9;
+					if (AMH > 9) {
+						AMH = 9;
+					}
+				map[i][j] = AMH;
+			}
+		}
+		std::cout << "Passage: " << passageMade << std::endl;
+	}
+}
 void showMap() {
 	for (int i = 0; i < HEIGHT; ++i) {
 		for (int j = 0; j < WIDTH; ++j) {
@@ -47,6 +49,7 @@ void saveMap() {
 			fout << map[i][j];
 		}
 		fout << std::endl;
+		//std::cout << "Saving line: " << i << std::endl;
 	}
 	
 	fout.close();
@@ -61,13 +64,20 @@ void loadMap() {
 			fin >> buff;
 			map[i][j] = buff;
 		}
-
+		std::cout << "Loading line: " << i << std::endl;
     }
     fin.close();
 }
 
 int main() {
-	genMap();
+	genMapBase();
+	/* thread can a destroy map!!!
+	std::thread tA(genMapTerrain, 4);
+	std::thread tB(genMapTerrain, 4);
+	tA.join();
+	tB.join();
+	*/
+	genMapTerrain(8);
 	saveMap();
 	return 0;
 }
