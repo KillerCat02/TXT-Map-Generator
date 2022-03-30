@@ -3,7 +3,8 @@
 #include <fstream>
 #include <ctime>
 
-const int HEIGHT = 2048, WIDTH = 2048;
+
+const int HEIGHT = 512, WIDTH = 512;
 int map[HEIGHT][WIDTH];
 
 
@@ -18,12 +19,13 @@ void genMapBase() {
 	}
 }
 
+
 void genMapTerrain(int passage) {
 	int AMH = 0;
 	for (int passageMade = 0; passageMade < passage; ++passageMade) {
 			for (int i = 0; i < HEIGHT; ++i) {
 				for (int j = 0; j < WIDTH; ++j) {
-					AMH = (map[i][j]  * 2 + map[i-1][j] + map[i+1][j] + map[i][j-1] + map[i][j+1] + (map[i-1][j-1] + map[i+1][j+1] + map[i-1][j+1]) + map[i+1][j-1]) / 9;
+					AMH = (map[i][j] * 2 + map[i-1][j] + map[i+1][j] + map[i][j-1] + map[i][j+1] + map[i-1][j-1] + map[i+1][j+1] + map[i-1][j+1] + map[i+1][j-1]) / 9;
 					if (AMH > 9) {
 						AMH = 9;
 					}
@@ -36,6 +38,8 @@ void genMapTerrain(int passage) {
 		std::cout << "Passage: " << passageMade << std::endl;
 	}
 }
+
+
 void showMap() {
 	for (int i = 0; i < HEIGHT; ++i) {
 		for (int j = 0; j < WIDTH; ++j) {
@@ -52,7 +56,7 @@ void saveMap() {
 			fout << map[i][j];
 		}
 		fout << std::endl;
-		//std::cout << "Saving line: " << i << std::endl;
+		std::cout << "Saving line: " << i << std::endl;
 	}
 	
 	fout.close();
@@ -68,8 +72,8 @@ void loadMap() {
 			map[i][j] = buff;
 		}
 		std::cout << "Loading line: " << i << std::endl;
-    }
-    fin.close();
+	}
+	fin.close();
 }
 
 int main() {
