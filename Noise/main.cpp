@@ -23,9 +23,12 @@ void genMapTerrain(int passage) {
 	for (int passageMade = 0; passageMade < passage; ++passageMade) {
 			for (int i = 0; i < HEIGHT; ++i) {
 				for (int j = 0; j < WIDTH; ++j) {
-					AMH = ((map[i][j] * 2) + map[i-1][j] + map[i+1][j] + map[i][j-1] + map[i][j+1] + map[i-1][j-1] + map[i+1][j+1] + map[i-1][j+1] + map[i+1][j-1]) / 9;
+					AMH = (map[i][j]  * 2 + map[i-1][j] + map[i+1][j] + map[i][j-1] + map[i][j+1] + (map[i-1][j-1] + map[i+1][j+1] + map[i-1][j+1]) + map[i+1][j-1]) / 9;
 					if (AMH > 9) {
 						AMH = 9;
+					}
+					if (AMH < 0) {
+						AMH = 0;
 					}
 				map[i][j] = AMH;
 			}
@@ -71,13 +74,10 @@ void loadMap() {
 
 int main() {
 	genMapBase();
-	/* thread can a destroy map!!!
-	std::thread tA(genMapTerrain, 4);
-	std::thread tB(genMapTerrain, 4);
+	std::thread tA(genMapTerrain, 3);
+	std::thread tB(genMapTerrain, 3);
 	tA.join();
 	tB.join();
-	*/
-	genMapTerrain(8);
 	saveMap();
 	return 0;
 }
