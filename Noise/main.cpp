@@ -4,12 +4,12 @@
 #include <ctime>
 
 
-const int HEIGHT = 512, WIDTH = 512;
+const int HEIGHT = 256, WIDTH = 256;
 int map[HEIGHT][WIDTH];
 
 
 void genMapBase() {
-	srand(time(0));
+	srand(1);
 	int randInt = 0;
 	for (int i = 0; i < HEIGHT; ++i) {
 		for (int j = 0; j < WIDTH; ++j) {
@@ -25,17 +25,19 @@ void genMapTerrain(int passage) {
 	for (int passageMade = 0; passageMade < passage; ++passageMade) {
 			for (int i = 0; i < HEIGHT; ++i) {
 				for (int j = 0; j < WIDTH; ++j) {
+
 					AMH = (map[i][j] * 2 + map[i-1][j] + map[i+1][j] + map[i][j-1] + map[i][j+1] + map[i-1][j-1] + map[i+1][j+1] + map[i-1][j+1] + map[i+1][j-1]) / 9;
-					if (AMH > 9) {
-						AMH = 9;
-					}
-					if (AMH < 0) {
-						AMH = 0;
-					}
-				map[i][j] = AMH;
+					if (AMH > 9) { AMH = 9; }
+					if (AMH < 0) { AMH = 0; }
+					map[i][j] = AMH;
+
+					AMH = (map[j][i] * 2 + map[j-1][i] + map[j+1][i] + map[j][i-1] + map[j][i+1] + map[j-1][i-1] + map[j+1][i+1] + map[j-1][i+1] + map[j+1][i-1]) / 9;
+					if (AMH > 9) { AMH = 9; }
+					if (AMH < 0) { AMH = 0; }
+					map[j][i] = AMH;
+
+				}
 			}
-		}
-		std::cout << "Passage: " << passageMade << std::endl;
 	}
 }
 
@@ -48,6 +50,7 @@ void showMap() {
 		std::cout << std::endl;
 	}
 }
+
 
 void saveMap() {
 	std::ofstream fout("Noise/map.save");
