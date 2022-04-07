@@ -3,57 +3,76 @@
 #include <fstream>
 #include <ctime>
 
-
-const int HEIGHT = 256, WIDTH = 256;
+const int HEIGHT = 256;
+const int WIDTH = 256;
 int map[HEIGHT][WIDTH];
+int AMH;
+
+void baseGen();
+void terrainGen(int passage);
+void barierGen();
+void saveTerrain();
+void loadTerrain();
 
 
-void genMapBase() {
-	srand(1);
-	int randInt = 0;
+int main() {
+	baseGen();
+	terrainGen(4);
+	barierGen();
+	saveTerrain();
+	return 0;
+}
+
+
+void baseGen() {
+	srand(time(0));
 	for (int i = 0; i < HEIGHT; ++i) {
 		for (int j = 0; j < WIDTH; ++j) {
-			randInt = rand() % 10;
-			map[i][j] = randInt;
+			map[i][j] = rand() % 10;
 		}
 	}
 }
 
 
-void genMapTerrain(int passage) {
-	int AMH = 0;
+void terrainGen(int passage) {
 	for (int passageMade = 0; passageMade < passage; ++passageMade) {
 			for (int i = 0; i < HEIGHT; ++i) {
 				for (int j = 0; j < WIDTH; ++j) {
+					AMH += map[i][j] * 2;
+					if (i - 1 >= 0) { AMH += map[i-1][j]; }
+					if (i + 1 < HEIGHT) { AMH += map[i+1][j]; }
+					if (j - 1 >= 0) { AMH += map[i][j-1]; }
+					if (j + 1 < WIDTH) { AMH += map[i][j+1]; }
+					if (i - 1 >= 0 && j - 1 >= 0) { AMH += map[i-1][j-1]; }
+					if (i + 1 < HEIGHT && j + 1 < HEIGHT ) { AMH += map[i+1][j+1]; }
+					if (i - 1 >= 0 && j - 1 < WIDTH) { AMH += map[i-1][j+1]; }
+					if (i + 1 < HEIGHT && j - 1 >= 0) { AMH += map[i+1][j-1]; }
+					AMH = AMH / 9;
 
-					AMH = (map[i][j] * 2 + map[i-1][j] + map[i+1][j] + map[i][j-1] + map[i][j+1] + map[i-1][j-1] + map[i+1][j+1] + map[i-1][j+1] + map[i+1][j-1]) / 9;
-					if (AMH > 9) { AMH = 9; }
+					if (AMH >= 9) { AMH = 8; }
 					if (AMH < 0) { AMH = 0; }
 					map[i][j] = AMH;
-
-					AMH = (map[j][i] * 2 + map[j-1][i] + map[j+1][i] + map[j][i-1] + map[j][i+1] + map[j-1][i-1] + map[j+1][i+1] + map[j-1][i+1] + map[j+1][i-1]) / 9;
-					if (AMH > 9) { AMH = 9; }
-					if (AMH < 0) { AMH = 0; }
-					map[j][i] = AMH;
-
+					AMH = 0;
 				}
 			}
 	}
 }
 
 
-void showMap() {
-	for (int i = 0; i < HEIGHT; ++i) {
-		for (int j = 0; j < WIDTH; ++j) {
-			std::cout << map[i][j];
+void barierGen() {
+		for (int i = 0; i < HEIGHT; ++i) {
+			for (int j = 0; j < WIDTH; ++j) {
+					if (i - 1 < 0) { map[i][j] = 9; }
+					if (i + 1 == HEIGHT) { map[i][j] = 9; }
+					if (j - 1 < 0) { map[i][j] = 9; }
+					if (j + 1 == WIDTH) { map[i][j] = 9; }
+			}
 		}
-		std::cout << std::endl;
-	}
 }
 
 
-void saveMap() {
-	std::ofstream fout("Noise/map.save");
+void saveTerrain() {
+	std::ofstream fout("MapCreator/map.save");
 	for (int i = 0; i < HEIGHT; ++i) {
 		for (int j = 0; j < WIDTH; ++j) {
 			fout << map[i][j];
@@ -66,8 +85,8 @@ void saveMap() {
 }
 
 
-void loadMap() {
-	std::ifstream fin("Noise/map.save");
+void loadTerrain() {
+	std::ifstream fin("MapCreator/map.save");
 	char buff;
 	for(int i = 0; i < HEIGHT; ++i) {
 		for(int j = 0; j < WIDTH; ++j) {
@@ -77,14 +96,4 @@ void loadMap() {
 		std::cout << "Loading line: " << i << std::endl;
 	}
 	fin.close();
-}
-
-int main() {
-	genMapBase();
-	std::thread tA(genMapTerrain, 3);
-	std::thread tB(genMapTerrain, 3);
-	tA.join();
-	tB.join();
-	saveMap();
-	return 0;
 }
